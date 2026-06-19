@@ -145,6 +145,24 @@
     .flicker { animation: none; }
     .cursor  { animation: none; opacity: 1; }
   }
+  /* ---- shared top navigation ---- */
+  .topnav {
+    display: flex; flex-wrap: wrap; gap: 8px 24px;
+    padding-bottom: 16px; margin-bottom: 22px;
+    border-bottom: 1px solid rgba(143,169,154,0.14);
+  }
+  .topnav a {
+    color: var(--accent); text-decoration: none; letter-spacing: 0.05em;
+    border-bottom: 1px solid transparent; padding-bottom: 2px;
+    transition: border-color .15s ease, color .15s ease, text-shadow .15s ease;
+  }
+  .topnav a::before { content: "› "; color: var(--text-dim); }
+  .topnav a:hover, .topnav a:focus-visible {
+    color: #d7e7df; border-bottom-color: var(--accent);
+    text-shadow: 0 0 10px rgba(47,224,141,0.5); outline: none;
+  }
+  .topnav a:focus-visible { outline: 1px dashed var(--accent); outline-offset: 4px; }
+  .topnav a[aria-current="page"] { color: #d7e7df; border-bottom-color: var(--accent); }
 </style>
 
 <div class="crt"></div>
@@ -156,6 +174,12 @@
       <span>bash — man matus</span>
       <span class="host">root@fsociety</span>
     </div>
+
+    <nav class="topnav" aria-label="Primary">
+      <a href="/">home/</a>
+      <a href="/resume" aria-current="page">resume/</a>
+      <a href="/contact">contact/</a>
+    </nav>
 
     <div id="screen">
       <p class="line"><span class="prompt">root@fsociety:~$</span> <span id="cmd">man matus</span></p>
@@ -237,10 +261,6 @@
         </div>
       </article>
 
-      <nav class="nav" aria-label="Site sections">
-        <a href="/">home/</a>
-        <a href="/contact">contact/</a>
-      </nav>
     </div>
 
     <footer class="statusbar">
