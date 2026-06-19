@@ -1,0 +1,310 @@
+<title>malinka.online // fsociety</title>
+<style>
+  :root {
+    --ground:   #0a0f0c;
+    --ground-2: #0c130e;
+    --text:     #8fa99a;
+    --text-dim: #54685c;
+    --accent:   #2fe08d;
+    --accent-2: #d8a93a;
+    --danger:   #e0533f;
+    --mono: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", "DejaVu Sans Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 16px;
+    line-height: 1.65;
+    letter-spacing: 0.02em;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ---- CRT overlays: scanlines, vignette, flicker ---- */
+  .crt::before,
+  .crt::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+  }
+  /* scanlines */
+  .crt::before {
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.28) 3px,
+      rgba(0, 0, 0, 0.28) 4px
+    );
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+  }
+  /* vignette + phosphor wash */
+  .crt::after {
+    background:
+      radial-gradient(120% 90% at 50% 45%, rgba(47, 224, 141, 0.05), rgba(0,0,0,0) 55%),
+      radial-gradient(140% 120% at 50% 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.85) 100%);
+  }
+
+  .flicker { animation: flicker 6s infinite steps(1); }
+  @keyframes flicker {
+    0%, 100%   { opacity: 1; }
+    97.0%      { opacity: 1; }
+    97.3%      { opacity: 0.72; }
+    97.6%      { opacity: 1; }
+    98.6%      { opacity: 0.9; }
+    98.9%      { opacity: 1; }
+  }
+
+  /* ---- Layout: centered ---- */
+  .stage {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: clamp(20px, 5vw, 64px);
+  }
+
+  .terminal {
+    width: 100%;
+    max-width: 720px;
+  }
+
+  .winbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(143, 169, 154, 0.14);
+    padding-bottom: 10px;
+    margin-bottom: 22px;
+  }
+  .dots { display: inline-flex; gap: 7px; }
+  .dots i {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: rgba(143,169,154,0.25);
+    display: inline-block;
+  }
+  .dots i:first-child { background: var(--danger); opacity: 0.85; }
+  .winbar .host { margin-left: auto; color: var(--text-dim); }
+
+  .line { white-space: pre-wrap; word-break: break-word; }
+  .prompt { color: var(--accent-2); }
+  .muted  { color: var(--text-dim); }
+  .ok     { color: var(--accent); }
+
+  .greet {
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(47, 224, 141, 0.55);
+    font-size: clamp(15px, 2.4vw, 19px);
+    margin: 4px 0 26px;
+  }
+
+  .name {
+    font-size: clamp(34px, 8.5vw, 76px);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.02;
+    color: #d7e7df;
+    margin: 2px 0 6px;
+    text-shadow: 0 0 18px rgba(47, 224, 141, 0.18);
+  }
+  .name .glitch { position: relative; display: inline-block; }
+  .rule {
+    width: clamp(120px, 30%, 260px);
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), rgba(47,224,141,0));
+    margin: 10px 0 14px;
+  }
+  .tagline {
+    color: var(--text);
+    font-size: clamp(14px, 2.2vw, 18px);
+    letter-spacing: 0.16em;
+  }
+  .tagline b { color: var(--accent-2); font-weight: 600; }
+
+  .aside {
+    color: var(--text-dim);
+    font-style: italic;
+    margin: 22px 0 28px;
+    max-width: 52ch;
+  }
+
+  /* nav as ls output */
+  .nav { display: flex; flex-wrap: wrap; gap: 14px 28px; margin-top: 6px; }
+  .nav a {
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+    transition: border-color 0.15s ease, color 0.15s ease, text-shadow 0.15s ease;
+  }
+  .nav a::before { content: "› "; color: var(--text-dim); }
+  .nav a:hover, .nav a:focus-visible {
+    color: #d7e7df;
+    border-bottom-color: var(--accent);
+    text-shadow: 0 0 10px rgba(47, 224, 141, 0.5);
+    outline: none;
+  }
+  .nav a:focus-visible { outline: 1px dashed var(--accent); outline-offset: 4px; }
+
+  .cursor {
+    display: inline-block;
+    width: 0.62em; height: 1.05em;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(47, 224, 141, 0.6);
+    transform: translateY(0.18em);
+    animation: blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+
+  /* status bar footer */
+  .statusbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    align-items: center;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-top: 1px solid rgba(143, 169, 154, 0.14);
+    padding-top: 16px;
+    margin-top: 40px;
+  }
+  .statusbar .tag { color: var(--danger); letter-spacing: 0.2em; }
+  .statusbar .spacer { margin-left: auto; }
+
+  .hidden { visibility: hidden; }
+  .reveal-in { animation: revealIn 0.5s ease both; }
+  @keyframes revealIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flicker { animation: none; }
+    .cursor  { animation: none; opacity: 1; }
+  }
+</style>
+
+<div class="crt"></div>
+
+<main class="stage flicker">
+  <section class="terminal" aria-label="malinka.online terminal">
+    <div class="winbar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span>bash — 80×24</span>
+      <span class="host">root@fsociety</span>
+    </div>
+
+    <div id="screen" role="log" aria-live="polite">
+      <p class="line"><span class="prompt">root@fsociety:~$</span> <span id="cmd">./hello.sh</span></p>
+      <p class="greet" id="greet">Hello, friend. Hello, friend? That's lame. Maybe I should give you a name.</p>
+
+      <h1 class="name"><span class="glitch" data-text="MATUS MALINKA">MATUS&nbsp;MALINKA</span></h1>
+      <div class="rule"></div>
+      <p class="tagline"><b>Platform</b> · <b>Automation</b> · <b>Orchestration</b></p>
+
+      <p class="aside">// I build the pipelines that move other people's secrets from A to B.
+The system's only as strong as the people running it — so I make the systems run themselves.</p>
+
+      <p class="line"><span class="prompt">root@fsociety:~$</span> <span id="cmd2">ls ./</span></p>
+      <nav class="nav" aria-label="Site sections">
+        <a href="/">home/</a>
+        <a href="/resume">resume/</a>
+        <a href="/contact">contact/</a>
+      </nav>
+    </div>
+
+    <footer class="statusbar">
+      <span class="tag">fsociety</span>
+      <span>conn: secure</span>
+      <span class="ok">[ OK ]</span>
+      <span class="spacer">© 2026 Matus Malinka</span>
+    </footer>
+  </section>
+</main>
+
+<script>
+  // The command and greeting type out; the rest reveals line by line.
+  // Enhancement only — all content is in the DOM and shows if JS is off.
+  (function () {
+    var blocks = Array.prototype.slice.call(document.querySelectorAll("#screen > *"));
+    var cmd   = document.getElementById("cmd");
+    var greet = document.getElementById("greet");
+    var greetText = greet.textContent;
+    var greetIndex = blocks.indexOf(greet);
+    var cmd2 = document.getElementById("cmd2");
+    var lsLine = cmd2.parentNode;
+    var lsIndex = blocks.indexOf(lsLine);
+
+    blocks.forEach(function (el) { el.classList.add("hidden"); });
+
+    // Typewriter that shows a live cursor while typing, then removes it.
+    function type(el, text, speed, done) {
+      el.textContent = "";
+      var node = document.createTextNode("");
+      var cur = document.createElement("span");
+      cur.className = "cursor";
+      cur.setAttribute("aria-hidden", "true");
+      el.appendChild(node);
+      el.appendChild(cur);
+      var i = 0;
+      (function step() {
+        node.nodeValue = text.slice(0, i);
+        if (i++ <= text.length) setTimeout(step, speed + Math.random() * 35);
+        else el.removeChild(cur);
+      })();
+      // call done when typing is finished
+      setTimeout(done, text.length * speed + 200);
+    }
+
+    // Reveal a contiguous range of blocks, one per beat, then call done.
+    function revealRange(start, end, done) {
+      var i = start;
+      (function next() {
+        if (i >= end) { if (done) done(); return; }
+        blocks[i].classList.remove("hidden");
+        blocks[i].classList.add("reveal-in");
+        i++;
+        setTimeout(next, 260);
+      })();
+    }
+
+    // Sequence:
+    // 1) type ./hello.sh  2) type greeting  3) pause, reveal name + info
+    // 4) pause, type ls ./  5) reveal the nav links
+    blocks[0].classList.remove("hidden");
+    setTimeout(function () {
+      type(cmd, "./hello.sh", 75, function () {
+        greet.classList.remove("hidden");
+        type(greet, greetText, 13, function () {
+          setTimeout(function () {
+            revealRange(greetIndex + 1, lsIndex, function () {
+              setTimeout(function () {
+                lsLine.classList.remove("hidden");
+                type(cmd2, "ls ./", 80, function () {
+                  revealRange(lsIndex + 1, blocks.length);
+                });
+              }, 800);
+            });
+          }, 1800);
+        });
+      });
+    }, 350);
+  })();
+</script>
