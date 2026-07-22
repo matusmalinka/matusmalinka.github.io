@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.classList.add("js");</script>
 <title>resume // malinka.online</title>
 <style>
   :root {
@@ -139,7 +140,9 @@
   .statusbar .ok { color: var(--accent); }
   .statusbar .spacer { margin-left: auto; }
 
-  .hidden { visibility: hidden; }
+  /* Hide animated blocks until JS reveals them (no-JS: fully visible) */
+  html.js #screen > * { visibility: hidden; }
+  html.js #screen > *.shown { visibility: visible; }
   .reveal-in { animation: revealIn 0.55s ease both; }
   @keyframes revealIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
@@ -302,8 +305,8 @@
   (function () {
     var blocks = Array.prototype.slice.call(document.querySelectorAll("#screen > *"));
     var cmd = document.getElementById("cmd");
-
-    blocks.forEach(function (el) { el.classList.add("hidden"); });
+    var cmdText = cmd.textContent;
+    cmd.textContent = "";
 
     function type(el, text, speed, done) {
       el.textContent = "";
@@ -320,14 +323,13 @@
       setTimeout(done, text.length * speed + 200);
     }
 
-    blocks[0].classList.remove("hidden");
+    blocks[0].classList.add("shown");
     setTimeout(function () {
-      type(cmd, "man matus", 75, function () {
+      type(cmd, cmdText, 75, function () {
         var i = 1;
         (function next() {
           if (i >= blocks.length) return;
-          blocks[i].classList.remove("hidden");
-          blocks[i].classList.add("reveal-in");
+          blocks[i].classList.add("shown", "reveal-in");
           i++;
           setTimeout(next, 220);
         })();

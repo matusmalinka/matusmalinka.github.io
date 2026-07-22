@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.classList.add("js");</script>
 <title>malinka.online // fsociety</title>
 <style>
   :root {
@@ -193,7 +194,9 @@
   .statusbar .tag { color: var(--danger); letter-spacing: 0.2em; }
   .statusbar .spacer { margin-left: auto; }
 
-  .hidden { visibility: hidden; }
+  /* Hide animated blocks until JS reveals them (no-JS: fully visible) */
+  html.js #screen > * { visibility: hidden; }
+  html.js #screen > *.shown { visibility: visible; }
   .reveal-in { animation: revealIn 0.5s ease both; }
   @keyframes revealIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
 
@@ -281,12 +284,14 @@ The system's only as strong as the people running it — so I make the systems r
     var blocks = Array.prototype.slice.call(document.querySelectorAll("#screen > *"));
     var cmd   = document.getElementById("cmd");
     var greet = document.getElementById("greet");
+    var cmdText = cmd.textContent;
     var greetText = greet.textContent;
     var greetIndex = blocks.indexOf(greet);
 
-    blocks.forEach(function (el) { el.classList.add("hidden"); });
+    // Clear typed fields before first paint of the prompt line
+    cmd.textContent = "";
+    greet.textContent = "";
 
-    // Typewriter that shows a live cursor while typing, then removes it.
     function type(el, text, speed, done) {
       el.textContent = "";
       var node = document.createTextNode("");
@@ -301,28 +306,24 @@ The system's only as strong as the people running it — so I make the systems r
         if (i++ <= text.length) setTimeout(step, speed + Math.random() * 35);
         else el.removeChild(cur);
       })();
-      // call done when typing is finished
       setTimeout(done, text.length * speed + 200);
     }
 
-    // Reveal a contiguous range of blocks, one per beat, then call done.
     function revealRange(start, end, done) {
       var i = start;
       (function next() {
         if (i >= end) { if (done) done(); return; }
-        blocks[i].classList.remove("hidden");
-        blocks[i].classList.add("reveal-in");
+        blocks[i].classList.add("shown", "reveal-in");
         i++;
         setTimeout(next, 260);
       })();
     }
 
-    // Sequence:
-    // 1) type ./hello.sh  2) type greeting  3) pause, reveal name + info
-    blocks[0].classList.remove("hidden");
+    // Sequence: type ./hello.sh → type greeting → pause → reveal name + info
+    blocks[0].classList.add("shown");
     setTimeout(function () {
-      type(cmd, "./hello.sh", 75, function () {
-        greet.classList.remove("hidden");
+      type(cmd, cmdText, 75, function () {
+        greet.classList.add("shown");
         type(greet, greetText, 13, function () {
           setTimeout(function () {
             revealRange(greetIndex + 1, blocks.length);

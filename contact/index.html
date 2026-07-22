@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.classList.add("js");</script>
 <title>contact // malinka.online</title>
 <style>
   :root {
@@ -160,7 +161,9 @@
   .statusbar .tag { color: var(--danger); letter-spacing: 0.2em; }
   .statusbar .spacer { margin-left: auto; }
 
-  .hidden { visibility: hidden; }
+  /* Hide animated blocks until JS reveals them (no-JS: fully visible) */
+  html.js #screen > * { visibility: hidden; }
+  html.js #screen > *.shown { visibility: visible; }
   .reveal-in { animation: revealIn 0.5s ease both; }
   @keyframes revealIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
 
@@ -270,8 +273,10 @@
     var cmd2 = document.getElementById("cmd2");
     var cmd2Line = cmd2.parentNode;
     var cmd2Index = blocks.indexOf(cmd2Line);
-
-    blocks.forEach(function (el) { el.classList.add("hidden"); });
+    var cmdText = cmd.textContent;
+    var cmd2Text = cmd2.textContent;
+    cmd.textContent = "";
+    cmd2.textContent = "";
 
     function type(el, text, speed, done) {
       el.textContent = "";
@@ -292,21 +297,20 @@
       var i = start;
       (function next() {
         if (i >= end) { if (done) done(); return; }
-        blocks[i].classList.remove("hidden");
-        blocks[i].classList.add("reveal-in");
+        blocks[i].classList.add("shown", "reveal-in");
         i++;
         setTimeout(next, 220);
       })();
     }
 
-    blocks[0].classList.remove("hidden");
+    blocks[0].classList.add("shown");
     setTimeout(function () {
-      type(cmd, "cat ./contact.txt", 70, function () {
-        revealRange(1, cmd2Index, function () {       // title, rule, fields
+      type(cmd, cmdText, 70, function () {
+        revealRange(1, cmd2Index, function () {
           setTimeout(function () {
-            cmd2Line.classList.remove("hidden");
-            type(cmd2, "ls ./social/", 75, function () {
-              revealRange(cmd2Index + 1, blocks.length); // socials, back nav
+            cmd2Line.classList.add("shown");
+            type(cmd2, cmd2Text, 75, function () {
+              revealRange(cmd2Index + 1, blocks.length);
             });
           }, 500);
         });
