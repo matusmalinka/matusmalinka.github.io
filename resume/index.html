@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>resume // malinka.online</title>
 <style>
   :root {
@@ -163,6 +165,28 @@
   }
   .topnav a:focus-visible { outline: 1px dashed var(--accent); outline-offset: 4px; }
   .topnav a[aria-current="page"] { color: #d7e7df; border-bottom-color: var(--accent); }
+
+  /* ---- mobile ---- */
+  @media (max-width: 640px) {
+    body { font-size: 14px; }
+    .stage { padding: 16px 14px 28px; }
+    .winbar { gap: 10px; font-size: 10px; letter-spacing: 0.1em; }
+    .winbar .host { display: none; }
+    .manhead { flex-direction: column; gap: 4px; }
+    .manhead .mid { order: -1; }
+    .manhead span:last-child { display: none; }
+    .sec p { max-width: none; }
+    .name-val { font-size: 15px; word-break: break-word; }
+    .synopsis { word-break: break-word; }
+    .opt .desc { padding-left: 12px; }
+    .history li { grid-template-columns: 1fr; gap: 2px; margin-bottom: 10px; }
+    .history .yr { font-size: 12px; }
+    .seealso a { word-break: break-all; }
+    .topnav { gap: 10px 18px; }
+    .topnav a { min-height: 44px; display: inline-flex; align-items: center; }
+    .statusbar { gap: 6px 14px; font-size: 11px; letter-spacing: 0.08em; }
+    .statusbar .spacer { margin-left: 0; width: 100%; margin-top: 4px; }
+  }
 </style>
 
 <div class="crt"></div>
