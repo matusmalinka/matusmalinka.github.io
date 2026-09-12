@@ -287,6 +287,7 @@ then teach agents the skills to keep the system running when nobody's watching.<
   // The command and greeting type out; the rest reveals line by line.
   // Enhancement only — all content is in the DOM and shows if JS is off.
   (function () {
+    var screen = document.getElementById("screen");
     var blocks = Array.prototype.slice.call(document.querySelectorAll("#screen > *"));
     var cmd   = document.getElementById("cmd");
     var greet = document.getElementById("greet");
@@ -294,7 +295,9 @@ then teach agents the skills to keep the system running when nobody's watching.<
     var greetText = greet.textContent;
     var greetIndex = blocks.indexOf(greet);
 
-    // Clear typed fields before first paint of the prompt line
+    // Lock final layout height before clearing typed fields, so the
+    // statusbar doesn't jump as the typewriter fills empty lines in.
+    screen.style.minHeight = screen.getBoundingClientRect().height + "px";
     cmd.textContent = "";
     greet.textContent = "";
 
